@@ -1,12 +1,18 @@
 import os
 import cv2 as cv
 import numpy as np
+import whisper
 from google import genai
 from PIL import Image
 from google.genai import types
 from dotenv import load_dotenv
 
 def main():
+    #whisper stuff
+    model = whisper.load_model("tiny")
+    result = model.transcribe("Testingaudio.m4a")
+    print(result["text"])
+
     os.environ["QT_QPA_PLATFORM"] = "xcb"
     os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH", None)
     cam = cv.VideoCapture(0)
