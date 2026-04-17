@@ -1,37 +1,43 @@
-# I was thinking of using this to do the speech to text:
-# https://realpython.com/python-speech-recognition/
-
-# Once we get the text we can give it to gemini or something to make it into an actual
-# text we can use with the model
-
-# Also some potential cool factor ideas:
-
-# -> Sticks - we can make a sort of sticks game with different colored blocks that are worth different
-# amounts of points and we'd always ask it to pick up the next most valuable block and
-# play against a person
-
-# -> Recipie - robot picks up tiny food items which are ingredients to make something
-
-# -> Organize by Color - robot picks up like colored tapes or blocks and puts them in
-# different bins based on color, or this could be done with types of food, animals
-# plants, etc 
-
 import os
+import cv2 as cv
+import numpy as np
 from google import genai
 from PIL import Image
 from google.genai import types
 from dotenv import load_dotenv
 
 def main():
-    #speechText = speechToText()
-    speechText = "Pick up the object that is shaped different"
-    ourPrompt = speechTextToAI(speechText)
-    print(ourPrompt)
+    os.environ["QT_QPA_PLATFORM"] = "xcb"
+    os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH", None)
+    cam = cv.VideoCapture(0)
+    if not cam.isOpened():
+        print("No camera")
+        exit()
+
+    while True:
+        ret, frame = cam.read()
+        if not ret:
+            print("No frame")
+            break
+        
+        cmd = input("q to quit, enter for picture: ").lower()
+        if cmd != "q":
+            cv.imwrite("output.png", frame)
+            speechText = speechToText()
+            speechText = "What is in the picture"
+            ourPrompt = speechTextToAI(speechText)
+            print(ourPrompt)
+            # update txt file here
+            print("got pic")
+            os.remove("output.png")
+        else:
+            break
+    cam.release()
 
 def speechTextToAI(speechText):
     load_dotenv()
     client = genai.Client(api_key=os.getenv("apiKey"))
-    img = Image.open("/home/laura-szabo/Downloads/robot.png")
+    img = Image.open("/home/laura-szabo/Code/School/Lens/speechToPrompt/output.png")
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         config=types.GenerateContentConfig(
@@ -40,7 +46,8 @@ def speechTextToAI(speechText):
         "do is take the following prompt, and simplify it down for the robot using the picture as reference. Only return the modified prompt and nothing else."),
         contents=[img, speechText],
     )
-    return response.text
+    return response.text    
+
 
 def speechToText(): #
     pass
