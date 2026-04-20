@@ -8,6 +8,11 @@ from google.genai import types
 from dotenv import load_dotenv
 
 def main():
+    #whisper stuff
+    model = whisper.load_model("tiny")
+    result = model.transcribe("Testingaudio.m4a")
+    print(result["text"])
+
     os.environ["QT_QPA_PLATFORM"] = "xcb"
     os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH", None)
     cam = cv.VideoCapture(0)
@@ -25,7 +30,7 @@ def main():
         if cmd != "q":
             cv.imwrite("output.png", frame)
             speechText = speechToText()
-            # speechText = "What is in the picture"
+            speechText = "What is in the picture"
             ourPrompt = speechTextToAI(speechText)
             print(ourPrompt)
             # update txt file here
@@ -51,12 +56,7 @@ def speechTextToAI(speechText):
 
 
 def speechToText(): #
-    #whisper stuff
-    model = whisper.load_model("tiny")
-    result = model.transcribe("Testingaudiov2.m4a")
-    print(result["text"])
-
-    return result
+    pass
 
 if __name__ == "__main__":
     main()
