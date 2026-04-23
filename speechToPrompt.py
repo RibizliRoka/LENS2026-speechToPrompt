@@ -40,7 +40,7 @@ def callback(indata, outdata, frames, time, status):
     audio_chunks.append(indata.copy())
 
 
-def main():
+def speechToPromptMain():
     #record audio
     print("Press s to start, and then press s to stop recording")
 
@@ -96,6 +96,7 @@ def main():
             # update txt file here
             print("got pic")
             os.remove("output.png")
+            os.remove("output_sd.wav")
         else:
             break
     cam.release()
@@ -114,9 +115,6 @@ def speechTextToAI(speechText):
     )
     return response.text    
 
-
-def speechToText(): #
-    pass
 
 if __name__ == "__main__":
     main()
