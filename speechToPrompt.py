@@ -13,6 +13,10 @@ import numpy as np
 from scipy.io.wavfile import write
 from pynput import keyboard
 
+#wake word stuff
+import openwakeword
+from openwakeword.model import Model
+
 startRecording_event = threading.Event()
 stopRecording_event = threading.Event()
 is_recording = False
@@ -41,6 +45,7 @@ def callback(indata, outdata, frames, time, status):
 
 
 def speechToPromptMain():
+    '''
     #record audio
     print("Press s to start, and then press s to stop recording")
 
@@ -67,6 +72,8 @@ def speechToPromptMain():
     fs = 44100  # Sample rate
     write("output_sd.wav", fs, full_audio)
     print("Audio saved to output_sd.wav")
+    '''
+    listenForWakeWord()
 
     #whisper stuff
     model = whisper.load_model("tiny")
@@ -115,6 +122,26 @@ def speechTextToAI(speechText):
     )
     return response.text    
 
+#wake word stuff
+def listenForWakeWord():
+    openwakeword.utils.download_models()
+    model = Model(wakeword_models=["hey grippy", "okay grippy"])
+
+    with sd.InputStream(samplerate=16000, channels=1, dtype='int16', blocksize=1280) as stream:
+        while True:
+            frame, _ = stream.read(1280)
+            prediction = model.predict(frame.flatten())
+
+            if prediction["hey grippy"] > 0.5 and not is_recording:
+                is_recording = True
+                startRecording_event.set()
+                print("Starting recording...")  
+
+            elif prediction["okay grippy"] > 0.5 and is_recording:
+                is_recording = False
+                stopRecording_event.set()
+                print("Stop recording.....")  
+                break
 
 if __name__ == "__main__":
-    main()
+    speechToPromptMain()

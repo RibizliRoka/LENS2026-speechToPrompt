@@ -191,6 +191,7 @@ class RobotClient:
         return response.text    
     
     def getAudioPrompt(self):
+        '''
         #record audio
         print("Press s to start, and then press s to stop recording")
 
@@ -216,7 +217,9 @@ class RobotClient:
         # Save as WAV file
         fs = 44100  # Sample rate
         write("output_sd.wav", fs, full_audio)
-        print("Audio saved to output_sd.wav")
+        print("Audio saved to output_sd.wav")'''
+
+        self.listenForWakeWord()
 
         #whisper stuff
         model = whisper.load_model("tiny")
